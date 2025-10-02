@@ -1,0 +1,100 @@
+service: quiztopia-api
+frameworkVersion: "4"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-north-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    TABLE_NAME: QuiztopiaTable 
+    JWT_SECRET: ${env:JWT_SECRET, 'dev-secret'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+          Resource:
+            - { "Fn::GetAtt": ["QuiztopiaTable", "Arn"] }
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "arn:aws:logs:eu-north-1:435830281389:log-group:/aws/lambda/*:*"
+
+functions:
+  signup:
+    handler: src/functions/authRouts/authCrud.signup
+    events:
+      - httpApi:
+          path: /auth/signup
+          method: POST
+
+  login:
+    handler: src/functions/authRouts/authCrud.login
+    events:
+      - httpApi:
+          path: /auth/login
+          method: POST
+
+  listQuizzes:
+    handler: src/functions/getAllQuiz/getAllQuiz.list
+    events:
+      - httpApi:
+          path: /quizzes
+          method: GET
+
+  getQuiz:
+    handler: src/functions/getQuizId/getAllQuizId.get
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}
+          method: GET
+
+  createQuiz:
+    handler: src/functions/addQuiz/addQuiz.create
+    events:
+      - httpApi:
+          path: /quizzes
+          method: POST
+
+  addQuestion:
+    handler: src/functions/addQuestions/addQuestion.add
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}/questions
+          method: POST
+
+  deleteQuiz:
+    handler: src/functions/removeQuiz/removeQuiz.remove
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}
+          method: DELETE
+
+  addScore:
+    handler: src/functions/scores/scores.addScore
+    events:
+      - httpApi:
+          path: /quizzes/{quizId}/scores
+          method: POST
+
+resources:
+  Resources:
+    QuiztopiaTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: QuiztopiaTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - { AttributeName: PK, AttributeType: S }
+          - { AttributeName: SK, AttributeType: S }
+        KeySchema:
+          - { AttributeName: PK, KeyType: HASH }
+          - { AttributeName: SK, KeyType: RANGE }
