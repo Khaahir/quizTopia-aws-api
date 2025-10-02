@@ -70,3 +70,87 @@ When you are done developing, don't forget to run `serverless deploy` to deploy 
 
 
 
+POST
+Create user
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/auth/signup
+﻿
+
+Body
+raw (json)
+json
+{
+  "email": "jesperpersson96@hotmail.se",
+  "password": "Hejhej123"
+}
+POST
+Login
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/auth/login
+﻿
+
+Body
+raw (json)
+json
+{
+  "email": "jesperpersson96@hotmail.se",
+  "password": "Hejhej123"
+}
+POST
+Create Quiz
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/quizzes
+﻿
+
+Authorization
+Bearer Token
+Token
+{{vault:authorization-secret}}
+Body
+raw (json)
+json
+{
+    "name":"testar"
+}
+POST
+create questions
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/quizzes/quizid/questions?
+﻿
+
+Authorization
+Bearer Token
+Token
+{{vault:authorization-secret}}
+Query Params
+Body
+raw (json)
+json
+{
+  "text": "vilket år skapades denna",
+  "answer": "1982",
+  "coords": {
+    "lat": 12.12,
+    "lng": 31.11
+  }
+}
+GET
+log all quiz
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/quizzes
+﻿
+
+GET
+log quiz with id
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/quizzes/quizid
+﻿
+
+POST
+add score
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/quizzes/quizid/scores
+﻿
+
+Body
+raw (json)
+json
+{
+ "score":33
+}
+DELETE
+delete a quiz
+https://gpwg73j90f.execute-api.eu-north-1.amazonaws.com/quizzes/quizid
